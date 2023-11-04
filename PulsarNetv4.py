@@ -51,12 +51,16 @@ raw_data_normalization_for_z = args.raw_data_normalization_for_z
 logger_info = f'time_res: {time_res}\n'
 
 model_loading_start_time = time.time()
-scaler = joblib.load('/hercules/scratch/atya/PulsarNet/models/classifier_scaler_runBF.joblib')
-clf = joblib.load('/hercules/scratch/atya/PulsarNet/models/classifier_SGD_runBF.joblib')
+scaler = joblib.load('models/classifier_scaler.joblib')
+clf = joblib.load('models/classifier_SGD.joblib')
 # model_regressor_z = tf.keras.models.load_model('/hercules/scratch/atya/PulsarNet/models/z_predict_attention_6445575_runBF_checkpoint.h5')
 # model_regressor_f = tf.keras.models.load_model('/hercules/scratch/atya/PulsarNet/models/f_predict_LSTM_6446470_runBF_checkpoint.h5')
-model_regressor_z = tf.keras.models.load_model('/hercules/scratch/atya/BinaryML/hyperparameter_tuning/attention_z/tuner_predict_attention_z_9471055_619_checkpoint.h5')
-model_regressor_f = tf.keras.models.load_model('/hercules/scratch/atya/BinaryML/models/tuner_predict_cnn_f_10354172_200_checkpoint.h5')
+#model_regressor_z = tf.keras.models.load_model('/hercules/scratch/atya/BinaryML/hyperparameter_tuning/attention_z/tuner_predict_attention_z_9471055_619_checkpoint.h5')
+#model_regressor_f = tf.keras.models.load_model('/hercules/scratch/atya/BinaryML/models/tuner_predict_cnn_f_10354172_200_checkpoint.h5')
+
+model_regressor_z = tf.keras.models.load_model('models/z_predictor.h5')
+model_regressor_f = tf.keras.models.load_model('models/f_predictor.h5')
+
 model_loading_end_time = time.time()
 logger_info += f'Time taken to load models: {(model_loading_end_time - model_loading_start_time):.2f}s\n'
     

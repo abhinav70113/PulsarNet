@@ -1,0 +1,9 @@
+predicted_p_middle[ms]: 9.3888130000
+predicted_a_magnitude[m/s^2]: 38.64009
+predicted_pdot_magnitude[s/s]: 1.210119e-09
+predicted_p_fold_pos_z[ms]: 9.3881633223
+predicted_p_fold_neg_z[ms]: 9.3894626777
+predicted_sigma_levels: [23.9, 8.7]
+predicted_pos_or_neg_accel_sign: pos
+predicted_z[index]: 15.827286
+time_taken[s]: 5.72151

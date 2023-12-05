@@ -8,14 +8,13 @@ PulsarNet is the first machine learning based frequency domain acceleration sear
 - [Installation](#installation)
 - [Usage](#usage)
 - [File Structure](#file-structure)
-- [Contributing](#contributing)
+<!-- - [Contributing](#contributing)
 - [License](#license)
-- [Acknowledgements](#acknowledgements)
+- [Acknowledgements](#acknowledgements) -->
 
 ## Prerequisites
 
 1. [Conda](https://docs.conda.io/en/latest/miniconda.html) - Used for managing environments and dependencies.
-2. [Presto](https://github.com/scottransom/presto.git) Singularity Image - Used for folding the candidates after the search is complete
 
 ## Installation
 
@@ -42,7 +41,7 @@ PulsarNet is the first machine learning based frequency domain acceleration sear
 
 3. **Download Model Binaries**:
 
-    Navigate to the [releases page](https://github.com/abhinav70113/PulsarNet.git/releases) and download the necessary model binaries. Place them in the "models" directory (mention the directory if it's specific).
+    Navigate to the [releases page](https://github.com/abhinav70113/PulsarNet.git/releases) and download the necessary model binaries. Place them in the "models" directory.
 
 ## Usage
 
@@ -60,9 +59,9 @@ PulsarNet is the first machine learning based frequency domain acceleration sear
 5. Fold the desired candidate using:
 
     ```bash
-    python fold.py --cand 1 output/time_series_example_PulsarNet.txt 
+    python fold.py --cand 1 --only_cmd output/time_series_example_PulsarNet.txt 
     ```
-    This will output a folded profile in the directory "output". Optionally, you can print only the folding command using the `--only_cmd` flag.
+    This will output the commands to fold the time series file using presto. Additionally if you have the singularity image of [Presto](https://github.com/scottransom/presto.git) available, specify it's locations in the `config.json` file and the folded candidates would be saved in "output". 
 
 ## File Structure
 

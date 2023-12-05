@@ -16,6 +16,7 @@ parser = argparse.ArgumentParser(description="Script parameters")
 parser.add_argument("PulsarNet_file", type=str, help="Path to the PulsarNet candidate file")
 parser.add_argument("--model", type=str, default="modelA", help="Model to use for inference")
 parser.add_argument("--cand",type=int,default=1,help="Candidate number to fold")
+parser.add_argument("--only_cmd",action='store_true',help="Only print the command to be executed")
 
 
 def a_from_z(z,T_obs,h,P_s):
@@ -59,6 +60,11 @@ def main():
     p_fold_neg_z = calculate_presto_fold_p_neg(p_pred,-pd_pred_abs,T_obs/60)
 
     #sing_prefix = 'singularity exec -H $HOME:/home1 -B /hercules:/hercules/  /hercules/scratch/atya/compare_pulsar_search_algorithms.simg '
+    if args.only_cmd:
+        print(f'prepfold -topo -coarse -p {p_fold_pos_z} -pd {pd_pred_abs} -o output/{output_label}_pos -noxwin {dat_file}')
+        print(f'prepfold -topo -coarse -p {p_fold_neg_z} -pd {-pd_pred_abs} -o output/{output_label}_neg -noxwin {dat_file}')
+        return
+
     myexecute(sing_prefix+f'prepfold -topo -coarse -p {p_fold_pos_z} -pd {pd_pred_abs} -o output/{output_label}_pos -noxwin {dat_file}')
     myexecute(sing_prefix+f'prepfold -topo -coarse -p {p_fold_neg_z} -pd {-pd_pred_abs} -o output/{output_label}_neg -noxwin {dat_file}')
 

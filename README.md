@@ -62,6 +62,7 @@ PulsarNet is the first machine learning based frequency domain acceleration sear
     ```bash
     python fold.py --cand 1 output/time_series_example_PulsarNet.txt 
     ```
+    This will output a folded profile in the directory "output". Optionally, you can print only the folding command using the `--only_cmd` flag.
 
 ## File Structure
 

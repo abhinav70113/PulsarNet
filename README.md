@@ -41,7 +41,7 @@ PulsarNet is the first machine learning based frequency domain acceleration sear
 
 3. **Download Model Binaries**:
 
-    Navigate to the [releases page](https://github.com/abhinav70113/PulsarNet.git/releases) and download the necessary model binaries. Place them in the "models" directory.
+    Navigate to the [releases page](https://github.com/abhinav70113/PulsarNet/releases) and download the necessary model binaries. Place them in the "models" directory.
 
 ## Usage
 

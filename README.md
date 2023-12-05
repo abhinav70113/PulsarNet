@@ -47,7 +47,7 @@ PulsarNet is the first machine learning based frequency domain acceleration sear
 
 1. Ensure you have the model binaries and other necessary files in place.
 
-2. Modify `config.json` if necessary, to suit your needs. Especially make sure to enter the location of Presto singularity image.
+2. Modify `config.json` if necessary, to suit your needs. Make sure to enter the location of Presto singularity image, if available.
 
 3. Run the main script:
 

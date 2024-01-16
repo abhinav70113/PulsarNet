@@ -13,8 +13,18 @@ PulsarNet is the first machine learning based frequency domain acceleration sear
 - [Acknowledgements](#acknowledgements) -->
 
 ## Prerequisites
-
-1. [Conda](https://docs.conda.io/en/latest/miniconda.html) - Used for managing environments and dependencies.
+Download the singularity image from drive [] for easiest access to PulsarNet. 
+    **OR**
+    Setup a [Conda](https://docs.conda.io/en/latest/miniconda.html) environment with the following libraries:
+    ```
+    python=3.8.0
+    cudatoolkit=10.1.243
+    cudnn=7.6.5
+    tensorflow=2.4.1=gpu
+    scikit-learn=1.2.2
+    numpy=1.19.5
+    joblib=1.1.1
+    ``` 
 
 ## Installation
 
@@ -25,18 +35,19 @@ PulsarNet is the first machine learning based frequency domain acceleration sear
     cd PulsarNet
     ```
 
-2. **Set up the Conda environment**:
+2. **Set up the environment**:
 
-    Create a Conda environment using the provided `environment.yml` file:
+    Activate the conda environment:
 
     ```bash
-    conda env create -f environment.yml
+    conda activate pulsarnet
     ```
+    OR
 
-    Activate the environment:
+    Enter the singularity image environment while mounting it locally, for example:
 
-    ```bash
-    conda activate tf-gpu4
+    ```
+    singularity shell -H $HOME:/home1 -B /<user>:/<user>/ /path/to/singularity/image
     ```
 
 3. **Download Model Binaries**:
@@ -47,7 +58,7 @@ PulsarNet is the first machine learning based frequency domain acceleration sear
 
 1. Ensure you have the model binaries and other necessary files in place.
 
-2. Modify `model_settings.cfd` if necessary, to suit your needs. Make sure to enter the location of Presto and PulsarNet singularity image.
+2. Modify `model_settings.cfd`, to suit your needs. Make sure to enter the location of Presto and PulsarNet singularity image.
 
 3. For using the gpu, run the following inside the mounted singularity image.
 
@@ -56,20 +67,20 @@ PulsarNet is the first machine learning based frequency domain acceleration sear
     ```
     If running on a cluster:
     ```
-    srun --cpus-per-task=1 --gres=gpu:1 singularity exec --nv -H $HOME:/home1 -B /hercules:/hercules/ /u/atya/singularity_images/pulsarnet.sif python main.py None --check_gpu
+    srun --cpus-per-task=1 --gres=gpu:1 singularity exec --nv -H $HOME:/home1 -B /<user>:/<user>/ /path/to/singularity/pulsarnet.sif python main.py None --check_gpu
     ```
     
-3. Run the main script:
+3. Run the main script inside the container. Make sure a corresponding '.inf' file in Presto's format is available in the same directory:
 
     ```bash
     python main.py time_series_example.dat
     ```
 4. This will output a candidate list in the directory "output".
 
-5. Fold the desired candidate using:
+5. Fold the desired candidates using:
 
     ```bash
-    python fold.py --cand 1 --only_cmd output/time_series_example_PulsarNet.txt 
+    python fold.py --cand 1 10 15 --only_cmd output/time_series_example_PulsarNet.txt 
     ```
     This will output the commands to fold the time series file using presto. Additionally if you have the singularity image of [Presto](https://github.com/scottransom/presto.git) available, specify it's locations in the `config.json` file and remove the `--only_cmd` flag. This will fold the candidates and save them in "output" directory. 
 

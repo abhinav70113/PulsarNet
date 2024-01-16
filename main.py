@@ -1,8 +1,8 @@
+import sys
 import numpy as np
 import glob
 import tensorflow as tf
 from numpy.lib.stride_tricks import as_strided
-import sys
 import time
 import joblib
 import json
@@ -10,29 +10,63 @@ import argparse
 import os
 from settings import M_SUN, G, c
 from file_processing import process_dat, process_fft
-from utils import overlapping_windows, compute_features, filter_predictions, load_config
-
+from utils import overlapping_windows, compute_features, filter_predictions, load_config, parse_inf_file
+import subprocess
 # Setting up argparse
 parser = argparse.ArgumentParser(description="Script parameters")
 
 parser.add_argument("dat_or_fft_file", type=str, help="Path to the dat or fft file")
-
-parser.add_argument("--freq_start", type=float, default=40, help="Frequency start in Hz")
-parser.add_argument("--freq_end", type=float, default=1000, help="Frequency end in Hz")
-parser.add_argument("--time_res", type=float, default=64e-6, help="Time resolution in seconds")
-parser.add_argument("--model", type=str, default="modelA", help="Model to use for inference")
+parser.add_argument("-l","--freq_start", type=float, default=40, help="Frequency start in Hz")
+parser.add_argument("-h","--freq_end", type=float, default=1000, help="Frequency end in Hz")
+parser.add_argument("-M","--model", type=str, default="modelA", help="Model to use for inference")
+# make this required with no default
+parser.add_argument("-o", "--output_label", type=str, required=True, help="Output label for the results.")
+# Add a check_gpu flag
+parser.add_argument("--check_gpu", action='store_true', help="Only check if GPU is available for use")
 
 def main():
     args = parser.parse_args()
 
+    if args.check_gpu:
+        print("TensorFlow version:", tf.__version__)
+        print("Is GPU available:", tf.test.is_gpu_available())
+        print("Visible devices:", tf.config.list_physical_devices())
+        print('Run the program without the --check_gpu flag to continue')
+        sys.exit()
+
+    # Edit: Check if this logger_info string method might be bad for RAM since it has to keep storing everything in memory, problematic for long candidate lists
+    # Edit: Add this under verbosity levels
+    #tf.debugging.set_log_device_placement(True)
+    physical_devices = tf.config.list_physical_devices()
+    # Edit: Add this under verbosity levels and logger
+    # Edit: See if all print statements are to be left in or removed
+    print("Available devices:", physical_devices)
     #dat_or_fft_file = f'/hercules/results/atya/BinaryML/sims/{args.run}/dat_inf_files/{args.dat_or_fft_file}'
+    
+
     dat_or_fft_file = args.dat_or_fft_file
 
     freq_start = args.freq_start
     freq_end = args.freq_end
-    time_res = args.time_res
     model_name = args.model
-    config = load_config(model_name)
+    output_dir = args.output_label
+
+    # Edit: Maybe don't harcode the config file path 
+    cfg_file_path = 'model_settings.cfg'
+    parsed_data = load_config(cfg_file_path)
+    config = parsed_data[model_name]
+
+    # Parse the inf file name to get meta data
+    inf_file_name = dat_or_fft_file[:-3] + 'inf'
+
+    # Check if the inf file exists
+    if not os.path.exists(inf_file_name):
+        print(f"Error: {inf_file_name} does not exist")
+        sys.exit()
+
+    parsed_inf_file = parse_inf_file(inf_file_name)
+    time_res = np.float64(parsed_inf_file['Width of each time series bin (sec)'])
+    print(f"Time resolution: {time_res}")
 
     logger_info = f'time_res: {time_res}\n'
 
@@ -48,10 +82,10 @@ def main():
     model_regressor_f = tf.keras.models.load_model(config["f_model"])
 
     
-    max_z = config["max_z"]
-    max_f = config["max_f"]
-    step_size = config["step_size"]
-    chunk_size = config["chunk_size"]
+    max_z = np.float64(config["max_z"])
+    max_f = np.float64(config["max_f"])
+    step_size = np.int32(config["step_size"])
+    chunk_size = np.int32(config["chunk_size"])
     raw_data_normalization_for_z = bool(config["raw_data_normalization_for_z"])
     raw_data_normalization_for_f = bool(config["raw_data_normalization_for_f"])
 
@@ -60,12 +94,13 @@ def main():
     print("Models loaded sucessfully")
 
     file_process_time_start = time.time()
+    # Edit: this is weird because if the fft file is passed instead, the prefpold will be formed using the fft file name and crash therefore, since it can only take
     logger_info+=f'Processing file: {dat_or_fft_file}\n'
 
-    out_file = dat_or_fft_file.split('/')[-1]
-    #root_dir = '/'.join(dat_or_fft_file.split('/')[:-1])
-    root_dir = os.getcwd()
-    output_label, extension = out_file.split('.')
+    out_file_list = dat_or_fft_file.split('/')
+    file_name = out_file_list[-1]
+    root_dir = output_dir
+    output_label, extension = file_name.split('.')
     #ind = int(sys.argv[1])
 
     if extension == 'dat':
@@ -80,7 +115,6 @@ def main():
         print('Invalid file extension')
         sys.exit()
 
-
     search_time_start = time.time()
     fft_size = len(power)
     dat_size = 2*(fft_size - 1)
@@ -92,7 +126,6 @@ def main():
     logger_info+=f'fft_size: {fft_size}\n'
 
     print("FFT processsed sucessfully")
-
     freq_ind_start = np.argmin(np.abs(freq_axis - freq_start)) - chunk_size
     if freq_ind_start < 0:
         freq_ind_start = 0
@@ -196,7 +229,7 @@ def main():
     print("Regressor sucessfully processed all chunks. Writing results to the file")
 
     # Create or overwrite the external file
-    with open(f'{root_dir}/output/{output_label}_PulsarNet.txt', 'w') as file:
+    with open(f'{root_dir}_PulsarNet.txt', 'w') as file:
         
         # Write logger_info to the file
         file.write(logger_info)

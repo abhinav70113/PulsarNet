@@ -47,8 +47,18 @@ PulsarNet is the first machine learning based frequency domain acceleration sear
 
 1. Ensure you have the model binaries and other necessary files in place.
 
-2. Modify `config.json` if necessary, to suit your needs. Make sure to enter the location of Presto singularity image, if available.
+2. Modify `model_settings.cfd` if necessary, to suit your needs. Make sure to enter the location of Presto and PulsarNet singularity image.
 
+3. For using the gpu, run the following inside the mounted singularity image.
+
+    ```bash
+    python main.py None --check_gpu
+    ```
+    If running on a cluster:
+    ```
+    srun --cpus-per-task=1 --gres=gpu:1 singularity exec --nv -H $HOME:/home1 -B /hercules:/hercules/ /u/atya/singularity_images/pulsarnet.sif python main.py None --check_gpu
+    ```
+    
 3. Run the main script:
 
     ```bash

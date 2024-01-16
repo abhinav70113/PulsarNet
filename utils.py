@@ -9,6 +9,7 @@ import numpy as np
 from numpy.lib.stride_tricks import as_strided
 import json
 import re
+import configparser
 
 def overlapping_windows(input_array: np.ndarray, step_size: int, chunk_size: int) -> np.ndarray:
     """
@@ -104,13 +105,37 @@ def filter_predictions(decision_values: np.ndarray, step_size: int, freq_ind_sta
 
     return sure_signals
 
-def load_config(model_name: str):
-    with open('config.json', 'r') as f:
-        config = json.load(f)
-        if model_name in config:
-            return config[model_name]
-        else:
-            raise ValueError(f"No configuration found for model: {model_name}")
+def parse_inf_file(file_path):
+    data = {}
+    with open(file_path, 'r') as file:
+        for line in file:
+            # Strip whitespace and split the line on '=' if it contains it
+            if '=' in line:
+                key, value = line.split('=', 1)
+                # Further processing to clean up the key and value
+                key = key.strip()
+                value = value.split("#")[0].strip()  # Remove any comments
+                # Add to the dictionary
+                data[key] = value
+    return data
+
+def load_config(cfg_file_path):
+    # Create a ConfigParser object
+    config = configparser.ConfigParser()
+
+    # Read the configuration file
+    config.read(cfg_file_path)
+
+    # Create a dictionary to hold the parsed data
+    config_data = {}
+
+    # Iterate over the sections and options in the file
+    for section in config.sections():
+        config_data[section] = {}
+        for option in config.options(section):
+            config_data[section][option] = config.get(section, option)
+
+    return config_data
 
 def parse_pulsarnet_output_file(log_file_loc):
 
@@ -127,6 +152,9 @@ def parse_pulsarnet_output_file(log_file_loc):
     # Extracting various information
     time_taken_matches = time_taken_pattern.findall(data)
     processing_file = processing_file_pattern.search(data).group(1)
+    # If processing file ending is .fft, then replace it with .dat, because we only fold .dat files
+    if processing_file.endswith('.fft'):
+        processing_file = processing_file[:-4] + '.dat'
     other_info_matches = other_info_pattern.findall(data)
     table_matches = table_pattern.findall(data)
 

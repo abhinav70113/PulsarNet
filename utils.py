@@ -105,6 +105,27 @@ def filter_predictions(decision_values: np.ndarray, step_size: int, freq_ind_sta
 
     return sure_signals
 
+def filter_chunks_by_decision_value(chunks, classifier, scaler):
+    """ Filter chunks based on classifier decision value. """
+    features = np.apply_along_axis(compute_features, 1, chunks)
+    standardized_features = scaler.transform(features)
+    decision_values = classifier.decision_function(standardized_features)
+    positive_indices = np.where(decision_values > 0)[0]
+    return chunks[positive_indices], decision_values[positive_indices], positive_indices
+
+def find_non_overlapping_chunks(chunk_infos, tolerance):
+    """ Identify and filter out consecutive chunks based on start frequency index. """
+    sorted_chunks = sorted(chunk_infos, key=lambda x: x['start_freq_ind_chunk'])
+    filtered_chunks = []
+    
+    for i in range(len(sorted_chunks)):
+        if i == 0 or sorted_chunks[i]['start_freq_ind_chunk'] - sorted_chunks[i - 1]['start_freq_ind_chunk'] >= tolerance:
+            filtered_chunks.append(sorted_chunks[i])
+        elif sorted_chunks[i]['confidence'] > sorted_chunks[i - 1]['confidence']:
+            filtered_chunks[-1] = sorted_chunks[i]
+
+    return filtered_chunks
+
 def parse_inf_file(file_path):
     data = {}
     with open(file_path, 'r') as file:

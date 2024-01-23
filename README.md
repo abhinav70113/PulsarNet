@@ -16,7 +16,7 @@ PulsarNet is the first machine learning based frequency domain acceleration sear
 Download the singularity image from drive [] for easiest access to PulsarNet. 
     **OR**
     Setup a [Conda](https://docs.conda.io/en/latest/miniconda.html) environment with the following libraries:
-    ```
+    ```bash
     python=3.8.0
     cudatoolkit=10.1.243
     cudnn=7.6.5

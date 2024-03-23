@@ -94,3 +94,14 @@ Download the singularity image from drive [] for easiest access to PulsarNet.
 - `fold.py` - Fold the candidates estimated using main.py.
 - `environment.yml` - Conda environment file with required dependencies.
 
+## Known Bugs and Edits
+
+- In fold.py: If one enters python fold.py -c 1 random_dat_file.dat, then the code will fail as it considers the '.dat' file to be candidate as well. This happened after introducing the feature of folding multiple candidates at once
+- In fold.py: #Edit: take this out urgently as this is hard coded only for Ter5 file:     if 'full' not in dat_file:
+        dat_file = dat_file.replace('m_ck', '_ck')
+- In main.py: # Edit: maybe not hardcode the value for maximum numbe rof candidates pulsarnet generates, currently set to 5000
+- In main.py: # Edit: candidates are sorted according to sklearn confidence in the one-to-one mapping loop before deep classifier, maybe change this to the confidence of the deep classifier
+- In main.py: # Edit: model loading times are not correct, they are included in the search time, classifier and regressor times should be evaluated separately as well.
+- In main.py: Fixed a major bug with the deep learning classifier
+
+
